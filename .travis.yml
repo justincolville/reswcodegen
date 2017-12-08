@@ -1,4 +1,2 @@
 language: csharp
 solution: vs2017/ReswCodeGen.sln
-install:
-  - nuget restore vs2017/ReswCodeGen.sln
