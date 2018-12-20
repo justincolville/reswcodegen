@@ -94,29 +94,46 @@ namespace ChristianHelle.DeveloperTools.CodeGenerators.Resw.VSPackage.CustomTool
                                                                new CodeArrayIndexerExpression(new CodeVariableReferenceExpression("currentAssemblySplit"),
                                                                                               new CodePrimitiveExpression(1)));
 
-            var createResourceLoader = new CodeConditionStatement(
+            var resourceNameVar = new CodeVariableDeclarationStatement(typeof(string), "resourceName");
+
+            var setResourceName = new CodeConditionStatement(
                 new CodeSnippetExpression("executingAssemblyName.Equals(currentAssemblyName)"),
                 new CodeStatement[] // true
                 {
-                    visualStudioVersion == VisualStudioVersion.VS2013
-                        ? new CodeAssignStatement(new CodeFieldReferenceExpression(null, "resourceLoader"),
-                                                  new CodeMethodInvokeExpression(new CodeTypeReferenceExpression("ResourceLoader"),
-                                                                                 "GetForCurrentView",
-                                                                                 new CodeSnippetExpression("\"" + className + "\"")))
-                        : new CodeAssignStatement(new CodeFieldReferenceExpression(null, "resourceLoader"),
-                                                  new CodeObjectCreateExpression(new CodeTypeReference("ResourceLoader"),
-                                                                                 new CodeSnippetExpression("\"" + className + "\"")))
+                          new CodeAssignStatement(new CodeVariableReferenceExpression("resourceName"),
+                                                        new CodeSnippetExpression("\"" + className + "\""))
+
                 },
                 new CodeStatement[] // false
                 {
-                    visualStudioVersion == VisualStudioVersion.VS2013
-                        ? new CodeAssignStatement(new CodeFieldReferenceExpression(null, "resourceLoader"),
-                                                  new CodeMethodInvokeExpression(new CodeTypeReferenceExpression("ResourceLoader"),
-                                                                                 "GetForCurrentView",
-                                                                                 new CodeSnippetExpression("currentAssemblyName + \"/" + className + "\"")))
-                        : new CodeAssignStatement(new CodeFieldReferenceExpression(null, "resourceLoader"),
-                                                  new CodeObjectCreateExpression(new CodeTypeReference("ResourceLoader"),
-                                                                                 new CodeSnippetExpression("currentAssemblyName + \"/" + className + "\"")))
+                          new CodeAssignStatement(new CodeVariableReferenceExpression("resourceName"),
+                                                        new CodeSnippetExpression("currentAssemblyName + \"/" + className + "\""))
+
+                });
+
+            var createResourceLoader = new CodeConditionStatement(
+                new CodeSnippetExpression("Windows.UI.Core.CoreWindow.GetForCurrentThread() != null"),
+                new CodeStatement[] // true
+                {
+                                      visualStudioVersion == VisualStudioVersion.VS2013
+                                          ? new CodeAssignStatement(new CodeFieldReferenceExpression(null, "resourceLoader"),
+                                                                    new CodeMethodInvokeExpression(new CodeTypeReferenceExpression("ResourceLoader"),
+                                                                                                    "GetForCurrentView",
+                                                                                                    new CodeSnippetExpression("resourceName")))
+                                          : new CodeAssignStatement(new CodeFieldReferenceExpression(null, "resourceLoader"),
+                                                                    new CodeObjectCreateExpression(new CodeTypeReference("ResourceLoader"),
+                                                                                                    new CodeSnippetExpression("resourceName")))
+                },
+                new CodeStatement[] // false
+                {
+                                      visualStudioVersion == VisualStudioVersion.VS2013
+                                          ? new CodeAssignStatement(new CodeFieldReferenceExpression(null, "resourceLoader"),
+                                                                    new CodeMethodInvokeExpression(new CodeTypeReferenceExpression("ResourceLoader"),
+                                                                                                    "GetForViewIndependentUse",
+                                                                                                    new CodeSnippetExpression("resourceName")))
+                                          : new CodeAssignStatement(new CodeFieldReferenceExpression(null, "resourceLoader"),
+                                                                    new CodeObjectCreateExpression(new CodeTypeReference("ResourceLoader"),
+                                                                                                    new CodeSnippetExpression("resourceName")))
                 });
 
             constructor.Statements.Add(executingAssemblyVar);
