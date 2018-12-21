@@ -146,6 +146,8 @@ namespace ChristianHelle.DeveloperTools.CodeGenerators.Resw.VSPackage.CustomTool
             constructor.Statements.Add(currentAssemblySplit);
             constructor.Statements.Add(currentAssemblyInit2);
             constructor.Statements.Add(currentAssemblyInit3);
+            constructor.Statements.Add(resourceNameVar);
+            constructor.Statements.Add(setResourceName);
             constructor.Statements.Add(createResourceLoader);
 
             targetClass.Members.Add(constructor);
